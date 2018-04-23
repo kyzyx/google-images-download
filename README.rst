@@ -253,6 +253,13 @@ Arguments
 |                   |             |                                                                                                                               |
 |                   |             | The path looks like this: "path/to/chromedriver". In windows it will be "path/to/chromedriver.exe"                            |
 +-------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------+
+| output_source     | os          | Save the image search results html to this file.                                                                              |
+|                   |             |                                                                                                                               |
+|                   |             | This is useful if you wish to download the images from a computer that does not have the chromedriver installed;              |
+|                   |             | instead, use one machine to get the source, save it using -output_source, and then load using -source.                        |
++-------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------+
+| source            | so          | Instead of searching google with the keywords specified, use the search results html in this file.                            |
++-------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------+
 | help              | h           | show the help message regarding the usage of the above arguments                                                              |
 +-------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------+
 

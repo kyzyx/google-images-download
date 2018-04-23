@@ -31,7 +31,8 @@ args_list = ["keywords", "keywords_from_file", "prefix_keywords", "suffix_keywor
              "limit", "related_images", "format", "color", "color_type", "usage_rights", "size",
              "aspect_ratio", "type", "time", "time_range", "delay", "url", "single_image",
              "output_directory", "proxy", "similar_images", "specific_site", "print_urls", "print_size",
-             "metadata", "extract_metadata", "socket_timeout", "thumbnail", "language", "prefix", "chromedriver"]
+             "metadata", "extract_metadata", "socket_timeout", "thumbnail", "language", "prefix", "chromedriver",
+             "source", "output_source"]
 
 
 def user_input():
@@ -94,6 +95,8 @@ def user_input():
         parser.add_argument('-px', '--proxy', help='specify a proxy address and port', type=str, required=False)
         parser.add_argument('-cd', '--chromedriver', help='specify the path to chromedriver executable in your local machine', type=str, required=False)
         parser.add_argument('-ri', '--related_images', default=False, help="Downloads images that are similar to the keyword provided", action="store_true")
+        parser.add_argument('-so', '--source', help="Use the specified html file instead of retrieving a google image search url", type=str, required=False)
+        parser.add_argument('-os', '--output_source', default=False, help="Save the google image search source instead of parsing and downloading", action="store_true")
 
         args = parser.parse_args()
         arguments = vars(args)
@@ -702,7 +705,7 @@ class googleimagesdownload:
 
         # If single_image or url argument not present then keywords is mandatory argument
         if arguments['single_image'] is None and arguments['url'] is None and arguments['similar_images'] is None and \
-                        arguments['keywords'] is None and arguments['keywords_from_file'] is None:
+                        arguments['keywords'] is None and arguments['keywords_from_file'] is None and arguments['source'] is None:
             raise ValueError('Keywords is a required argument!')
 
         # If this argument is present, set the custom output directory
@@ -733,10 +736,20 @@ class googleimagesdownload:
 
                     url = self.build_search_url(search_term,params,arguments['url'],arguments['similar_images'],arguments['specific_site'])      #building main search url
 
-                    if limit < 101:
-                        raw_html = self.download_page(url)  # download page
+                    if arguments['source']:
+                        sourcefile = open(arguments['source'], 'r')
+                        raw_html = '\n'.join(sourcefile.readlines())
                     else:
-                        raw_html = self.download_extended_page(url,arguments['chromedriver'])
+                        if limit < 101:
+                            raw_html = self.download_page(url)  # download page
+                        else:
+                            raw_html = self.download_extended_page(url,arguments['chromedriver'])
+
+                    if arguments['output_source']:
+                        sourcefile = open(main_directory + "/" + dir_name + '/source.html', 'w')
+                        sourcefile.write(raw_html)
+                        i+=1
+                        continue
 
                     print("Starting Download...")
                     items,errorCount = self._get_all_items(raw_html,main_directory,dir_name,limit,arguments)    #get all image items and download images
